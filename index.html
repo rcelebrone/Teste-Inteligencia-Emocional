@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Inteligência Emocional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-purple': '#6A0DAD', // Roxo profundo
+                        'brand-lime': '#CCFF00',   // Verde Limão vibrante
+                        'brand-black': '#000000',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #000;
+        }
+        .lime-shadow {
+            box-shadow: 4px 4px 0px #CCFF00;
+        }
+        .purple-shadow {
+            box-shadow: 4px 4px 0px #6A0DAD;
+        }
+        .btn-option:hover {
+            transform: translateY(-2px);
+            background-color: #CCFF00; /* Lime */
+            border-color: #000;
+        }
+        .btn-option.selected {
+            background-color: #6A0DAD; /* Purple */
+            color: white;
+            border-color: #000;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="max-w-xl w-full bg-white border-2 border-black lime-shadow p-8 rounded-lg animate-fade-in">
+        <div class="flex justify-center mb-6">
+            <div class="w-16 h-16 bg-brand-purple rounded-full flex items-center justify-center border-2 border-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-lime" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+            </div>
+        </div>
+        
+        <h1 class="text-4xl font-extrabold text-center text-brand-black mb-4 uppercase tracking-tighter">
+            Inteligência <span class="text-brand-purple">Emocional</span>
+        </h1>
+        
+        <p class="text-lg text-black mb-6 text-center leading-relaxed">
+            Descubra o seu nível de inteligência emocional. Pessoas com altos níveis conseguem criar relacionamentos mais significativos e lidar melhor com adversidades.
+        </p>
+
+        <div class="bg-brand-lime/20 border-l-4 border-brand-purple p-4 mb-8">
+            <p class="font-bold text-black text-sm">INSTRUÇÕES:</p>
+            <p class="text-black text-sm mt-1">
+                Responda com sinceridade, baseando-se em como você <strong>realmente é</strong>, e não em como gostaria de ser.
+            </p>
+        </div>
+
+        <button onclick="startQuiz()" class="w-full bg-brand-purple text-white font-bold text-xl py-4 border-2 border-black shadow-[4px_4px_0px_#000] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_#CCFF00] transition-all rounded-lg uppercase">
+            Iniciar Teste
+        </button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="hidden max-w-xl w-full">
+        <!-- Progress Bar -->
+        <div class="mb-6 bg-white border-2 border-black rounded-full h-6 relative overflow-hidden">
+            <div id="progress-bar" class="h-full bg-brand-lime border-r-2 border-black transition-all duration-300" style="width: 0%"></div>
+            <p id="progress-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-black">0%</p>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white border-2 border-black purple-shadow p-8 rounded-lg mb-6 relative">
+            <span id="question-pillar" class="absolute top-4 right-4 text-xs font-bold bg-brand-lime px-2 py-1 border border-black rounded uppercase">
+                Pilar
+            </span>
+            <span class="text-sm font-bold text-brand-purple uppercase tracking-widest block mb-2">Questão <span id="q-number">1</span>/20</span>
+            <h2 id="question-text" class="text-2xl font-bold text-black leading-tight min-h-[80px]">
+                Carregando pergunta...
+            </h2>
+        </div>
+
+        <!-- Options -->
+        <div class="space-y-3" id="options-container">
+            <!-- Buttons injected by JS -->
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="hidden max-w-2xl w-full animate-fade-in pb-10">
+        
+        <div class="bg-white border-2 border-black lime-shadow rounded-lg overflow-hidden mb-8">
+            <div class="bg-brand-purple p-8 text-center border-b-2 border-black">
+                <h2 class="text-brand-lime font-bold uppercase tracking-widest mb-2">Sua Pontuação</h2>
+                <div class="flex justify-center items-baseline text-white">
+                    <span id="final-score" class="text-7xl font-black">0</span>
+                    <span class="text-2xl font-bold text-brand-lime">/100</span>
+                </div>
+                <h3 id="result-title" class="text-3xl font-bold text-white mt-4 uppercase">Título do Resultado</h3>
+            </div>
+            
+            <div class="p-8">
+                <p id="result-desc" class="text-black text-lg leading-relaxed mb-6 font-medium">
+                    Descrição do resultado...
+                </p>
+                <div class="bg-gray-100 border border-black p-4 rounded text-center">
+                    <p class="text-sm font-bold text-black italic">"A autoconsciência é a capacidade fundamental da inteligência emocional."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pillars Grid -->
+        <h3 class="text-xl font-black text-black uppercase mb-4 pl-2 border-l-4 border-brand-purple">Análise por Pilares</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="pillars-container">
+            <!-- Pillars injected by JS -->
+        </div>
+
+        <button onclick="restartQuiz()" class="w-full bg-white text-black font-bold py-4 border-2 border-black shadow-[4px_4px_0px_#6A0DAD] hover:bg-brand-lime hover:translate-y-[-2px] transition-all rounded-lg uppercase">
+            Refazer Teste
+        </button>
+    </div>
+
+    <script>
+        // DATA
+        const questions = [
+            { id: 1, text: "Você sabe identificar as emoções que sente?", pillar: "Autoconsciência" },
+            { id: 2, text: "Você sabe se acalmar quando se sente inquieto ou chateado?", pillar: "Autogestão" },
+            { id: 3, text: "Você define metas a longo prazo?", pillar: "Autogestão" },
+            { id: 4, text: "Você procura entendimento mútuo nas questões?", pillar: "Consciência Social" },
+            { id: 5, text: "Você é um bom ouvinte?", pillar: "Gestão de Relacionamentos" },
+            { id: 6, text: "Você persiste na busca por seus objetivos, apesar dos obstáculos?", pillar: "Autogestão" },
+            { id: 7, text: "Você consegue admitir facilmente que cometeu um erro?", pillar: "Autogestão" },
+            { id: 8, text: "Você sabe suas qualidades e defeitos?", pillar: "Autoconsciência" },
+            { id: 9, text: "Você promove conversas difíceis para resolver problemas?", pillar: "Gestão de Relacionamentos" },
+            { id: 10, text: "Você tenta enxergar as situações pela perspectiva dos outros?", pillar: "Consciência Social" },
+            { id: 11, text: "Você tem ânimo para atingir seus objetivos?", pillar: "Autogestão" },
+            { id: 12, text: "Você consegue pensar claramente quando está sob pressão?", pillar: "Autogestão" },
+            { id: 13, text: "Você utiliza as críticas para crescer?", pillar: "Autoconsciência" },
+            { id: 14, text: "Você acha fácil ler as emoções dos outros?", pillar: "Consciência Social" },
+            { id: 15, text: "Você lida com pessoas e situações difíceis com delicadeza?", pillar: "Gestão de Relacionamentos" },
+            { id: 16, text: "Você se orienta pelos seus valores e objetivos?", pillar: "Autogestão" },
+            { id: 17, text: "Você supera facilmente o sentimento de frustração?", pillar: "Autogestão" },
+            { id: 18, text: "Você reconhece como seu comportamento afeta os outros?", pillar: "Autoconsciência" },
+            { id: 19, text: "Você consegue ouvir sem julgar?", pillar: "Consciência Social" },
+            { id: 20, text: "Você presta atenção aos seus relacionamentos?", pillar: "Gestão de Relacionamentos" }
+        ];
+
+        const options = [
+            { text: "Sempre", value: 5 },
+            { text: "Frequentemente", value: 4 },
+            { text: "De vez em quando", value: 3 },
+            { text: "Raramente", value: 2 },
+            { text: "Nunca", value: 1 }
+        ];
+
+        // STATE
+        let currentQuestionIndex = 0;
+        let answers = {};
+
+        // DOM ELEMENTS
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const questionPillar = document.getElementById('question-pillar');
+        const qNumber = document.getElementById('q-number');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const optionsContainer = document.getElementById('options-container');
+
+        // FUNCTIONS
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionText.textContent = q.text;
+            questionPillar.textContent = q.pillar;
+            qNumber.textContent = currentQuestionIndex + 1;
+            
+            // Update Progress
+            const progress = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${Math.round(progress)}%`;
+
+            // Render Options
+            optionsContainer.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option w-full text-left bg-white border-2 border-gray-200 text-black font-bold p-4 rounded-lg transition-all flex justify-between items-center';
+                btn.onclick = () => selectOption(opt.value, btn);
+                btn.innerHTML = `<span>${opt.text}</span>`;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(value, btnElement) {
+            // Visual feedback
+            const allBtns = document.querySelectorAll('.btn-option');
+            allBtns.forEach(b => b.classList.remove('selected', 'border-black'));
+            btnElement.classList.add('selected', 'border-black');
+
+            // Save answer
+            answers[questions[currentQuestionIndex].id] = value;
+
+            // Next question with delay
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 300);
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
+            document.getElementById('final-score').textContent = totalScore;
+
+            // Result Logic
+            let title = "";
+            let desc = "";
+
+            if (totalScore >= 80) {
+                title = "Nível Altíssimo (ou Alerta)";
+                desc = "Seus resultados indicam um nível extremamente alto ou, paradoxalmente, muito baixo devido à falta de autoconsciência. Se for fruto de autoconhecimento elevado: ótimo! Se for falta de autocrítica: lembre-se que é preciso ser autoconsciente para se avaliar com precisão.";
+            } else if (totalScore >= 60) {
+                title = "Bom Nível";
+                desc = "Bom nível de inteligência emocional. É bem provável que você seja sensível às emoções dos que estão ao seu redor. Você também tem consciência sobre o efeito do seu comportamento nos outros.";
+            } else if (totalScore >= 40) {
+                title = "Nível Baixo";
+                desc = "Seu nível de inteligência emocional ainda é um pouco baixo. Você tem mais dificuldade nas situações que exigem habilidades de interação social. É provável que se sinta frequentemente frustrado.";
+            } else {
+                title = "Necessita Atenção";
+                desc = "Você precisa trabalhar para desenvolver sua inteligência emocional. É provável que você se sinta sobrecarregado por suas emoções e lute para gerenciá-las. Trabalhe sua autoconsciência.";
+            }
+
+            document.getElementById('result-title').textContent = title;
+            document.getElementById('result-desc').textContent = desc;
+
+            // Pillar Logic
+            const pillarData = calculatePillars();
+            const pillarsContainer = document.getElementById('pillars-container');
+            pillarsContainer.innerHTML = '';
+
+            for (const [name, data] of Object.entries(pillarData)) {
+                const percentage = Math.round((data.score / data.total) * 100);
+                const barColor = percentage >= 70 ? 'bg-brand-lime' : percentage >= 40 ? 'bg-yellow-400' : 'bg-red-400';
+                
+                pillarsContainer.innerHTML += `
+                    <div class="bg-white border-2 border-black p-4 rounded-lg shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-black text-sm uppercase">${name}</h4>
+                            <span class="font-bold text-brand-purple">${data.score}/${data.total}</span>
+                        </div>
+                        <div class="h-3 bg-gray-200 rounded-full border border-black overflow-hidden">
+                            <div class="h-full ${barColor}" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function calculatePillars() {
+            const pillarScores = {
+                "Autoconsciência": { score: 0, total: 0 },
+                "Autogestão": { score: 0, total: 0 },
+                "Consciência Social": { score: 0, total: 0 },
+                "Gestão de Relacionamentos": { score: 0, total: 0 }
+            };
+
+            questions.forEach(q => {
+                if (answers[q.id]) {
+                    pillarScores[q.pillar].score += answers[q.id];
+                    pillarScores[q.pillar].total += 5;
+                }
+            });
+            return pillarScores;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            answers = {};
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+
